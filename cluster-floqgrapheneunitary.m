@@ -20,7 +20,7 @@ expBIymat=diag(exp(j*(2*pi/(3*N2))*Y1));
 
 
 Hmass=diag(repmat([M*(kron(ones(1,Lx/2),[1,-1])),M*(kron(ones(1,Lx/2),[-1,1]))],1,Ly/2));
-avgIPR=zeros(Lx*Ly,Lx*Ly);
+avgIPR=zeros(length(movingboundarr),Lx*Ly);
 for disavg=1:disavmax
     %disavg
     expH=eye(Lx*Ly);
@@ -66,25 +66,28 @@ for disavg=1:disavmax
     H00=spdiags(Hamiltoniantemp,dHamiltoniantemp,szU(1),szU(2));
     [W,d]=eig(full(H00));
     %d=eig(full(H00));
-    avgIPR=avgIPR+(abs(W).^4)./disavmax;
     En(:,disavg)=diag(d);   
-    %bott index         
+    %%% quasienergy dependent quantities    
     for movingboundchoice=1:length(movingboundarr)
+        %bott index
         movingbound=movingboundarr(movingboundchoice);
         p2=max(find(diag(d)<=max(movingbound,fixedbound)));
         p1=min(find(diag(d)>min(movingbound,fixedbound)));
-       UX=W(:,p1:p2)'*(expBIxmat)*W(:,p1:p2);
+        UX=W(:,p1:p2)'*(expBIxmat)*W(:,p1:p2);
         UY=W(:,p1:p2)'*(expBIymat)*W(:,p1:p2);
         Ubott=UY*UX*UY'*UX';
         [Ubotttemp,dUbotttemp]=spdiags(Ubott);
         szUbott=size(Ubott);
         Ubott00=spdiags(Ubotttemp,dUbotttemp,szUbott(1),szUbott(2));
         index(movingboundchoice,disavg)=imag(sum(log(eig(full(Ubott00)))))/(2*pi);
+        %avgIPR calculated at the different quasienergies
+        eigenveclist=find(abs(diag(d)-movingbound)<energywidthtolerance);
+        avgIPR(movingboundchoice,:)=avgIPR(movingboundchoice,:)+sum(abs(W(:,eigenveclist)).^4,2);
     end
     
 end
 Name=sprintf('data/graphenefloquetdisorderdata%s-%s.mat',datestring,JobID);
-save(Name,'Lx','Ly','PBCx','PBCy','A','M','w','tnn','tnnn','T','Tdiv','dt','Vrand','disavmax','seedvalue','En','index','avgIPR','movingboundarr')
+save(Name,'Lx','Ly','PBCx','PBCy','A','M','w','tnn','tnnn','T','Tdiv','dt','Vrand','disavmax','seedvalue','En','index','avgIPR','movingboundarr','energywidthtolerance')
 toc
 
 end

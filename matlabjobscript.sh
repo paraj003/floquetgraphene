@@ -29,13 +29,14 @@ Lx=20% even
 Ly=20%even
 PBCx=1;
 PBCy=1; % for PBC=1 for OBC =0 along y direction (zigzag)
-disavmax=1000;
+disavmax=100;
 %Vrand=0.1;
 seedvalue=14;
 rng(seedvalue);
 Vrandarr=[1.2];
 fixedbound=-10 % sets a bound at E=-12 where the gap is trivial
-movingboundarr=[-0.5:0.05:0.5]; % use moving bound to scan through the energy BZ.
+movingboundarr=[-1:0.05:1]; % use moving bound to scan through the energy BZ.
+energywidthtoleranced=0.01; %sets energy window in which to average the IPR for each realization
 JobID='$SLURM_JOB_ID';
 ">>floqgraphene-params-$SLURM_JOB_ID.m
 
