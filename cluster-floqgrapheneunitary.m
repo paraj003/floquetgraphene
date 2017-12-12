@@ -20,7 +20,7 @@ expBIymat=diag(exp(j*(2*pi/(3*N2))*Y1));
 
 
 Hmass=diag(repmat([M*(kron(ones(1,Lx/2),[1,-1])),M*(kron(ones(1,Lx/2),[-1,1]))],1,Ly/2));
-avgIPR=zeros(length(movingboundarr),Lx*Ly);
+avgIPR=zeros(Lx*Ly,length(movingboundarr));
 for disavg=1:disavmax
     %disavg
     expH=eye(Lx*Ly);
@@ -82,10 +82,11 @@ for disavg=1:disavmax
         index(movingboundchoice,disavg)=imag(sum(log(eig(full(Ubott00)))))/(2*pi);
         %avgIPR calculated at the different quasienergies
         eigenveclist=find(abs(diag(d)-movingbound)<energywidthtolerance);
-        avgIPR(movingboundchoice,:)=avgIPR(movingboundchoice,:)+sum(abs(W(:,eigenveclist)).^4,2);
+        avgIPR(:,movingboundchoice)=avgIPR(:,movingboundchoice)+sum(abs(W(:,eigenveclist)).^4,2)/length(eigenveclist);
     end
     
 end
+avgIPR=avgIPR/disavmax;
 Name=sprintf('data/graphenefloquetdisorderdata%s-%s.mat',datestring,JobID);
 save(Name,'Lx','Ly','PBCx','PBCy','A','M','w','tnn','tnnn','T','Tdiv','dt','Vrand','disavmax','seedvalue','En','index','avgIPR','movingboundarr','energywidthtolerance')
 toc
