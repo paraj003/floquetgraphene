@@ -35,8 +35,8 @@ seedvalue=14;
 rng(seedvalue);
 Vrandarr=[1.2];
 fixedbound=-10 % sets a bound at E=-12 where the gap is trivial
-movingboundarr=[-1:0.05:1]; % use moving bound to scan through the energy BZ.
-energywidthtolerance=0.01; %sets energy window in which to average the IPR for each realization
+movingboundarr=[-2:0.05:2]; % use moving bound to scan through the energy BZ.
+energywidthtolerance=0.025; %sets energy window in which to average the IPR for each realization
 JobID='$SLURM_JOB_ID';
 ">>floqgraphene-params-$SLURM_JOB_ID.m
 

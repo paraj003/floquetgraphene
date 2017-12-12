@@ -82,7 +82,10 @@ for disavg=1:disavmax
         index(movingboundchoice,disavg)=imag(sum(log(eig(full(Ubott00)))))/(2*pi);
         %avgIPR calculated at the different quasienergies
         eigenveclist=find(abs(diag(d)-movingbound)<energywidthtolerance);
-        avgIPR(:,movingboundchoice)=avgIPR(:,movingboundchoice)+sum(abs(W(:,eigenveclist)).^4,2)/length(eigenveclist);
+        if length(eigenveclist)>0
+           sum(sum(abs(W(:,eigenveclist)).^2,2)/length(eigenveclist))
+           avgIPR(:,movingboundchoice)=avgIPR(:,movingboundchoice)+sum(abs(W(:,eigenveclist)).^4,2)/length(eigenveclist);
+        end
     end
     
 end
