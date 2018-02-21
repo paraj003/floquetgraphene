@@ -2,6 +2,8 @@ for Mchoice=1:length(Marr)
 M=Marr(Mchoice)
 for Vrandchoice=1:length(Vrandarr)
 Vrand=Vrandarr(Vrandchoice)
+tnn_dis=tnn_disarr(Vrandchoice);
+tnnn_dis=tnnn_disarr(Vrandchoice);
 %%% define filenames:
 datestring=datestr(now,'yymmddHHMMSS');
 sprintf('%s-%s',datestring,JobID)
@@ -21,10 +23,13 @@ expBIymat=diag(exp(j*(2*pi/(3*N2))*Y1));
 
 Hmass=diag(repmat([M*(kron(ones(1,Lx/2),[1,-1])),M*(kron(ones(1,Lx/2),[-1,1]))],1,Ly/2));
 avgIPR=zeros(Lx*Ly,length(movingboundarr));
+countarr=zeros(length(movingboundarr),1);
 for disavg=1:disavmax
     %disavg
     expH=eye(Lx*Ly);
     Hrand=diag(Vrand*(-0.5+rand(Lx*Ly,1)));
+    tnn=tnn0+(tnn_dis*(-0.5+rand(1,1)));
+    tnnn=tnnn0+(tnnn_dis*(-0.5+rand(Lx*Ly,1)));
     for tchoice=1:Tdiv
         %tchoice
         Ax=A*(sin(w*((tchoice)*dt)));
@@ -48,9 +53,9 @@ for disavg=1:disavmax
         H11tot=H11+H11';
         H22=diag([kron(ones(1,Lx/2-1),[tnn2,tnn1]),tnn2],1)+diag(tnnn1*ones(1,Lx-2),2)+PBCx*diag(tnnn1conj*[1,1],Lx-2)+PBCx*diag(tnn1conj,Lx-1);
         H22tot=H22+H22';
-        H12=diag(kron(ones(1,Lx/2),[tnn3,0]))+diag(tnnn3*ones(1,Lx-1),1)+diag(tnnn2*ones(1,Lx-1),-1)+PBCx*diag(tnnn2,Lx-1);%+PBCx*diag(tnnn3,-Lx+1);
+        H12=diag(kron(ones(1,Lx/2),[tnn3,0]))+diag(tnnn3*ones(1,Lx-1),1)+diag(tnnn2*ones(1,Lx-1),-1)+PBCx*diag(tnnn2,Lx-1)+PBCx*diag(tnnn3,-Lx+1);
         H12conj=H12';
-        H21=diag(kron(ones(1,Lx/2),[0,tnn3]))+diag(tnnn3*ones(1,Lx-1),1)+diag(tnnn2*ones(1,Lx-1),-1)+PBCx*diag(tnnn2,Lx-1);%+PBCx*diag(tnnn3,-Lx+1);
+        H21=diag(kron(ones(1,Lx/2),[0,tnn3]))+diag(tnnn3*ones(1,Lx-1),1)+diag(tnnn2*ones(1,Lx-1),-1)+PBCx*diag(tnnn2,Lx-1)+PBCx*diag(tnnn3,-Lx+1);
         H21conj=H21';
         %time-dependent Hamiltoniaan
         H=Hmass+Hrand+kron(diag(kron(ones(1,Ly/2),[1,0])),H11tot)+kron(diag(kron(ones(1,Ly/2),[0,1])),H22tot)+kron(diag([kron(ones(1,Ly/2-1),[1,0]),1],1),H12)+kron(diag([kron(ones(1,Ly/2-1),[0,1]),0],1),H21)+kron(diag([kron(ones(1,Ly/2-1),[1,0]),1],-1),H12conj)+kron(diag([kron(ones(1,Ly/2-1),[0,1]),0],-1),H21conj)+PBCy*kron(diag(1,Ly-1),H21conj)+PBCy*kron(diag(1,-Ly+1),H21);
@@ -81,17 +86,16 @@ for disavg=1:disavmax
         Ubott00=spdiags(Ubotttemp,dUbotttemp,szUbott(1),szUbott(2));
         index(movingboundchoice,disavg)=imag(sum(log(eig(full(Ubott00)))))/(2*pi);
         %avgIPR calculated at the different quasienergies
-        eigenveclist=find(abs(diag(d)-movingbound)<energywidthtolerance);
-        if length(eigenveclist)>0
-           sum(sum(abs(W(:,eigenveclist)).^2,2)/length(eigenveclist))
-           avgIPR(:,movingboundchoice)=avgIPR(:,movingboundchoice)+sum(abs(W(:,eigenveclist)).^4,2)/length(eigenveclist);
-        end
+%        eigenveclist=find(abs(diag(d)-movingbound)<energywidthtolerance);
+%        if length(eigenveclist)>0
+%           countarr(movingboundchoice)=countarr(movingboundchoice)+length(eigenveclist);
+%           avgIPR(:,movingboundchoice)=avgIPR(:,movingboundchoice)+sum(abs(W(:,eigenveclist)).^4,2);
+%        end
     end
     
 end
-avgIPR=avgIPR/disavmax;
 Name=sprintf('data/graphenefloquetdisorderdata%s-%s.mat',datestring,JobID);
-save(Name,'Lx','Ly','PBCx','PBCy','A','M','w','tnn','tnnn','T','Tdiv','dt','Vrand','disavmax','seedvalue','En','index','avgIPR','movingboundarr','energywidthtolerance')
+save(Name,'Lx','Ly','PBCx','PBCy','A','M','w','tnn0','tnnn0','T','Tdiv','dt','Vrand','disavmax','seedvalue','En','index')%,'avgIPR','movingboundarr','energywidthtolerance','countarr')
 toc
 
 end
