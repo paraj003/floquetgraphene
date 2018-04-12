@@ -215,7 +215,9 @@ for disavg=1:disavmax
        Ubott00=spdiags(Ubotttemp,dUbotttemp,szUbott(1),szUbott(2));
        index(movingboundchoice,disavg)=imag(sum(log(eig(full(Ubott00)))))/(2*pi);
    end
-    
+Name=sprintf('data/graphenefloquetdisorderdata%s-%s.mat',datestring,JobID);
+save(Name,'Lx','Ly','PBCx','PBCy','A','M','w','tnn','tnnn','tnn_dis','tnnn_dis' ,'T','Tdiv','dt','Vrand','disavmax','seedvalue','En','index','movingboundarr')%,'avgIPR')
+   
 end
 Name=sprintf('data/graphenefloquetdisorderdata%s-%s.mat',datestring,JobID);
 save(Name,'Lx','Ly','PBCx','PBCy','A','M','w','tnn','tnnn','tnn_dis','tnnn_dis' ,'T','Tdiv','dt','Vrand','disavmax','seedvalue','En','index','movingboundarr')%,'avgIPR')
